@@ -109,7 +109,7 @@ html, body, [class*="css"] {
 }
 .metric-label {
     font-family: 'DM Mono', monospace;
-    font-size: clamp(0.75rem, 1.1vw, 0.50rem);
+    font-size: clamp(0.75rem, 1.1vw, 0.95rem);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #aaa;
@@ -480,13 +480,29 @@ elif page == "KPI Calculator":
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div style='background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; padding:1.2rem 1.5rem; margin-bottom:1.5rem;'>
-        <div style='font-family: DM Mono, monospace; font-size: 0.65rem; color: #c8f55a; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.6rem;'>Formula</div>
-        <div style='font-family: DM Mono, monospace; font-size: 0.9rem; color: #f0ece3;'>
-            KPI = min( state_benchmark / actual_people_per_shop,  1.0 )
+    <div style='background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px; padding:1.4rem 1.6rem; margin-bottom:1.5rem;'>
+        <div style='font-family: DM Mono, monospace; font-size: 0.7rem; color: #c8f55a; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.8rem;'>What is the Service Density KPI?</div>
+        <div style='font-family: DM Sans, sans-serif; font-size: 1rem; color: #ddd; line-height: 1.6; margin-bottom:1rem;'>
+            This score measures how well our scraped shop dataset covers a given area compared to what we'd expect based on that state's average salon density.
+            A score of <strong style='color:#c8f55a;'>1.0</strong> means we've collected enough shops to match the state benchmark.
+            Anything below 1.0 means we're missing shops — the lower the score, the bigger the gap.
         </div>
-        <div style='font-family: DM Sans, sans-serif; font-size: 0.82rem; color: #666; margin-top:0.6rem;'>
-            KPI ≥ 1.0 → adequate coverage &nbsp;·&nbsp; KPI < 0.5 → severely under-scraped
+        <div style='font-family: DM Mono, monospace; font-size: 0.85rem; color: #f0ece3; background:#111; padding: 0.7rem 1rem; border-radius:6px; margin-bottom:1rem;'>
+            KPI = state benchmark ÷ actual people per shop &nbsp;(capped at 1.0)
+        </div>
+        <div style='display:flex; gap:1.5rem; flex-wrap:wrap;'>
+            <div style='font-family: DM Mono, monospace; font-size: 0.75rem;'>
+                <span style='color:#c8f55a;'>● KPI ≥ 1.0</span>
+                <span style='color:#888; margin-left:0.5rem;'>Benchmark met — adequate coverage</span>
+            </div>
+            <div style='font-family: DM Mono, monospace; font-size: 0.75rem;'>
+                <span style='color:#F58518;'>● 0.5 ≤ KPI &lt; 1.0</span>
+                <span style='color:#888; margin-left:0.5rem;'>Partial coverage — more scraping needed</span>
+            </div>
+            <div style='font-family: DM Mono, monospace; font-size: 0.75rem;'>
+                <span style='color:#E45756;'>● KPI &lt; 0.5</span>
+                <span style='color:#888; margin-left:0.5rem;'>Severely under-scraped — prioritize data collection</span>
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -499,12 +515,13 @@ elif page == "KPI Calculator":
         state_sel = st.selectbox(
             "STATE",
             STATE_STATS["state"].tolist(),
+            index=STATE_STATS["state"].tolist().index("PA"),
             format_func=lambda s: f"{s} — {STATE_STATS.loc[STATE_STATS['state']==s,'state_name'].values[0]}"
         )
         city_name = st.text_input("CITY NAME", value="Philadelphia")
         population = st.number_input("POPULATION", min_value=1000, max_value=10_000_000,
                                       value=28000, step=1000)
-        scraped_shops = st.number_input("SCRAPED SHOPS IN DATASET", min_value=1, max_value=10000,
+        scraped_shops = st.number_input("SCRAPED SHOPS IN DATASET", min_value=1, max_value=500_000,
                                          value=45, step=5)
 
         benchmark = int(STATE_STATS.loc[STATE_STATS["state"] == state_sel, "people_per_salon"].values[0])
@@ -530,22 +547,17 @@ elif page == "KPI Calculator":
             kpi_color = "#c8f55a"
             status = "✅  Adequate Coverage"
             status_color = "#c8f55a"
-            advice = "Dataset meets the state benchmark. Coverage is sufficient for this locality."
-        elif kpi >= 0.8:
-            kpi_color = "#EECA3B"
-            status = "🟡  Near Benchmark"
-            status_color = "#EECA3B"
-            advice = "Close to benchmark. Minor gaps — consider light additional scraping."
+            advice = "We have enough shops in this area to meet the state benchmark. Ready for outreach."
         elif kpi >= 0.5:
             kpi_color = "#F58518"
-            status = "🟠  Under-Scraped"
+            status = "🟠  Partial Coverage"
             status_color = "#F58518"
-            advice = "Meaningful coverage gap. More scraping needed before outreach."
+            advice = "We have some shops here but not enough. More scraping is needed before outreach."
         else:
             kpi_color = "#E45756"
             status = "🔴  Severely Under-Scraped"
             status_color = "#E45756"
-            advice = "Critical gap. Data collection must be prioritized here before launch."
+            advice = "Major gap — very few shops collected relative to population. Prioritize data collection here."
 
         st.markdown(f"""
         <div class='kpi-display'>

@@ -92,23 +92,31 @@ html, body, [class*="css"] {
     background: #1a1a1a;
     border: 1px solid #2a2a2a;
     border-radius: 8px;
-    padding: 1.6rem 1.8rem;
+    padding: 1.4rem 1.2rem;
     margin-bottom: 0.5rem;
+    min-width: 0;
+    overflow: hidden;
 }
 .metric-value {
     font-family: 'Syne', sans-serif;
-    font-size: 3rem;
+    font-size: clamp(1.6rem, 2.5vw, 2.8rem);
     font-weight: 800;
     color: #c8f55a;
     line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .metric-label {
     font-family: 'DM Mono', monospace;
-    font-size: 0.78rem;
-    letter-spacing: 0.15em;
+    font-size: clamp(0.6rem, 0.9vw, 0.78rem);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #aaa;
     margin-top: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* KPI gauge */

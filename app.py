@@ -109,7 +109,7 @@ html, body, [class*="css"] {
 }
 .metric-label {
     font-family: 'DM Mono', monospace;
-    font-size: clamp(0.75rem, 1.1vw, 0.80rem);
+    font-size: clamp(0.75rem, 1.1vw, 0.50rem);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #aaa;

@@ -63,7 +63,7 @@ html, body, [class*="css"] {
     color: #c8f55a;
 }
 .hero-sub {
-    font-size: 1.25rem;
+    font-size: 1.45rem;
     color: #bbb;
     font-weight: 300;
     max-width: 620px;
@@ -109,7 +109,7 @@ html, body, [class*="css"] {
 }
 .metric-label {
     font-family: 'DM Mono', monospace;
-    font-size: clamp(0.6rem, 0.9vw, 0.78rem);
+    font-size: clamp(0.75rem, 1.1vw, 0.95rem);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #aaa;

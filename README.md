@@ -33,12 +33,12 @@ The work I owned on this project fell into two areas: **lead generation** and **
 
 ### 1. Lead Generation — Zip Code Coverage Analysis
 
-I was tasked with identifying which zip codes in priority states (GA, PA, NC, MI) were under-covered in the scraped dataset — i.e., where we didn't have enough shop data to run effective outreach. This involved:
+I was tasked with identifying which zip codes across all 13 swing states were under-covered in the scraped dataset — i.e., where we didn't have enough shop data to run effective outreach. This involved:
 
 - Joining scraped shop data to US Census demographic data at the zip code level in BigQuery (via Hex)
 - Building a **state-specific density benchmark** for each of the 13 target states, rather than relying on the static national industry average (1:773) which undercounts urban density
 - Deriving a normalized **Service Density KPI** (0–1) to measure how well each locality was covered relative to its state benchmark
-- Producing a CSV of all under-covered zips in GA, PA, NC, MI for the data team and organizers
+- Producing a CSV of all under-covered zips across all 13 swing states for the data team and organizers
 
 ### 2. Service Density KPI — Methodology
 

@@ -677,16 +677,20 @@ elif page == "Zip Prioritization":
     """, unsafe_allow_html=True)
 
     # Filters row
-    col_f1, col_f2, col_f3, col_f4 = st.columns(4)
+    col_f1, col_f2, col_f3 = st.columns(3)
     with col_f1:
         states_available = sorted(ZIP_DATA["state"].unique())
-        sel_states = st.multiselect("STATE", states_available, default=["GA","PA","MI"])
+        sel_states = st.multiselect("STATE", states_available, default=["GA","PA","WI","NH"])
     with col_f2:
         priority_filter = st.radio("PRIORITY", ["All", "High Priority Only", "Standard Only"])
     with col_f3:
         income_max = st.slider("MAX MEDIAN INCOME ($)", 20000, 100000, 100000, step=5000,
                                 format="$%d")
+
+    col_f4, col_f5 = st.columns(2)
     with col_f4:
+        black_min = st.slider("MIN % BLACK POPULATION", 0, 100, 0, step=5, format="%d%%")
+    with col_f5:
         nonwhite_min = st.slider("MIN % NON-WHITE POPULATION", 0, 100, 0, step=5, format="%d%%")
 
     # Apply filters
@@ -698,6 +702,7 @@ elif page == "Zip Prioritization":
     elif priority_filter == "Standard Only":
         df = df[df["high_priority"] == False]
     df = df[df["median_hh_income"] <= income_max]
+    df = df[df["pct_black"] >= black_min / 100]
     df = df[df["pct_nonwhite"] >= nonwhite_min / 100]
 
     # Summary bar
@@ -749,11 +754,12 @@ elif page == "Zip Prioritization":
     # Data table
     st.markdown("<div class='section-label'>Zip Code Detail</div>", unsafe_allow_html=True)
 
-    display = df[["zipcode","city","state","population","pct_nonwhite",
+    display = df[["zipcode","city","state","population","pct_black","pct_nonwhite",
                   "median_hh_income","median_age","high_priority"]].copy()
-    display.columns = ["ZIP","City","State","Population","% Non-White",
+    display.columns = ["ZIP","City","State","Population","% Black","% Non-White",
                        "Median HH Income","Median Age","High Priority"]
     display["Population"]       = display["Population"].apply(lambda x: f"{x:,}")
+    display["% Black"]          = display["% Black"].apply(lambda x: f"{x*100:.0f}%")
     display["% Non-White"]      = display["% Non-White"].apply(lambda x: f"{x*100:.0f}%")
     display["Median HH Income"] = display["Median HH Income"].apply(lambda x: f"${x:,}")
     display["High Priority"]    = display["High Priority"].apply(lambda x: "✅ Yes" if x else "No")

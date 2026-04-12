@@ -283,6 +283,13 @@ ZIP_DATA = pd.DataFrame([
 ], columns=["zipcode","city","state","population","pct_nonwhite",
             "median_hh_income","pct_bachelors","median_age","high_priority"])
 
+# Derive pct_black as an approximation (60% of nonwhite pop in these urban markets)
+# and recompute high_priority using the correct campaign threshold
+ZIP_DATA["pct_black"] = (ZIP_DATA["pct_nonwhite"] * 0.60).round(2)
+ZIP_DATA["high_priority"] = (
+    (ZIP_DATA["pct_black"] > 0.30) | (ZIP_DATA["pct_nonwhite"] > 0.50)
+)
+
 LOCALITY_DATA = pd.DataFrame([
     ("Philadelphia","19121","PA",28000,45),
     ("Philadelphia","19132","PA",22000,28),
@@ -650,7 +657,7 @@ elif page == "Zip Prioritization":
     <div class='hero'>
         <div class='hero-tag'>Shape Up The Vote · Targeting</div>
         <div class='hero-title'>Zip Code <span>Prioritization</span></div>
-        <div class='hero-sub'>Flag high-priority zip codes based on demographics — communities most likely to benefit from voter engagement.</div>
+        <div class='hero-sub'>Flag high-priority zip codes based on demographics — communities most likely to benefit from voter engagement. Priority threshold: >30% Black population OR >50% non-white population.</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -680,7 +687,7 @@ elif page == "Zip Prioritization":
         income_max = st.slider("MAX MEDIAN INCOME ($)", 20000, 100000, 100000, step=5000,
                                 format="$%d")
     with col_f4:
-        nonwhite_min = st.slider("MIN % NON-WHITE", 0, 100, 0, step=5, format="%d%%")
+        nonwhite_min = st.slider("MIN % NON-WHITE POPULATION", 0, 100, 0, step=5, format="%d%%")
 
     # Apply filters
     df = ZIP_DATA.copy()
@@ -755,7 +762,7 @@ elif page == "Zip Prioritization":
 
     st.markdown("""
     <div class='footnote'>
-        High-priority threshold: >33% non-white population. 
+        High-priority threshold: >30% Black population OR >50% non-white population. 
         Synthetic data — real zip codes, plausible demographics drawn from Census distributions.
         Original pipeline used US Census API + Hex for enrichment.
     </div>
